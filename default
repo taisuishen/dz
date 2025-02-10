@@ -11,6 +11,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+location /ws/ {  # 假设 PyWebIO 使用 ws://yourserver/ws/
+    proxy_pass http://10.1.194.2:8080;  # 内网地址
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+}
+
     # 配置 WebSocket 代理
     location /socket.io/ {
         proxy_pass http://10.1.194.2:8080;  # 将 WebSocket 请求转发到 PyWebIO 服务器（内网地址）
