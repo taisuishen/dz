@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Online</title>
+</head>
+<body>
+    <h1>Poker Online</h1>
+    <div id="msg-box"></div>
+    <form id="login-form">
+        <input type="text" id="player_name" placeholder="Player Name" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+    <form id="chat-form">
+        <input type="text" id="chat-text" placeholder="Type a message" required>
+        <button type="submit">Send</button>
+    </form>
+    <script>
+        async function login() {
+            const player_name = document.getElementById('player_name').value;
+            const password = document.getElementById('password').value;
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ player_name, password }),
+            });
+            const data = await response.json();
+            console.log(data);
+        }
+
+        async function sendMessage() {
+            const chatText = document.getElementById('chat-text').value;
+            const response = await fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ from_whom: 'Player', content: chatText }),
+            });
+            const data = await response.json();
+            console.log(data);
+        }
+
+        async function getMessages() {
+            const response = await fetch('/get_messages');
+            const data = await response.json();
+            const msgBox = document.getElementById('msg-box');
+            msgBox.innerHTML = '';
+            data.messages.forEach(msg => {
+                const msgElement = document.createElement('div');
+                msgElement.textContent = `${msg.from_whom}: ${msg.content}`;
+                msgBox.appendChild(msgElement);
+            });
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            login();
+        });
+
+        document.getElementById('chat-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            sendMessage();
+        });
+
+        setInterval(getMessages, 1000);
+    </script>
+</body>
+</html>
